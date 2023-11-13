@@ -1,21 +1,92 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { PokemonDetails, PokemonListResponse } from './pokemon.model';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
+
+import { PokemonDetails, PokemonListResponse, PokemonResult } from './pokemon.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PokemonService {
-  baseUrl = 'https://pokeapi.co/api/v2/pokemon/'
-  constructor(private http:HttpClient) { }
+  baseUrl = 'https://pokeapi.co/api/v2/pokemon/';
+  pokemonsRaw: PokemonResult[] = [];
+  pokemonsUrl: string[] = [];
 
-  fetchPokemons(): Observable<PokemonListResponse> {
+  constructor(private http: HttpClient) {}
+
+  fetchAPI(): Observable<PokemonListResponse> {
     return this.http.get<PokemonListResponse>(this.baseUrl);
   }
-  fetchPokemon(url:string){
-    return this.http.get<PokemonDetails>(url)
+
+  attachData(): Observable<void> {
+    return this.fetchAPI().pipe(
+      map((data: PokemonListResponse) => {
+        this.pokemonsRaw = data.results;
+        this.attachUrls();
+      })
+    );
   }
 
+  fetchPokemon(url: string): Observable<PokemonDetails> {
+    return this.http.get<PokemonDetails>(url).pipe(
+      catchError((error) => {
+        console.error('Error in fetchPokemon:', error);
+        // Return a default PokemonDetails object or handle the error as needed
+        return of({
+          id: 0,
+          name: 'Unknown',
+          height: 0,
+          hp: 0,
+          attack: 0,
+          defense: 0,
+          specialAttack: 0,
+          speed: 0,
+          base_experience: 0,
+          order: 0,
+          weight: 0,
+          stats: [],
+          image: '',
+          sprites: { other: { dream_world: { front_default: '' } } },
+        });
+      })
+    );
+  }
 
+  attachUrls(): void {
+    this.pokemonsUrl = this.pokemonsRaw.map((pokemon) => pokemon.url);
+  }
+
+  fetchPokemonDetails(): Observable<PokemonDetails[]> {
+    const observables: Observable<PokemonDetails>[] = this.pokemonsUrl.map((url) =>
+      this.fetchPokemon(url).pipe(
+        map((data) => {
+          const hp = data.stats[0].base_stat;
+          const attack = data.stats[1].base_stat;
+          const defense = data.stats[2].base_stat;
+          const specialAttack = data.stats[3].base_stat;
+          const speed = data.stats[4].base_stat;
+          const image = data.sprites.other.dream_world.front_default;
+
+          return {
+            id: data.id,
+            name: data.name,
+            height: data.height,
+            hp,
+            attack,
+            defense,
+            specialAttack,
+            speed,
+            base_experience: data.base_experience,
+            order: data.order,
+            weight: data.weight,
+            stats: data.stats,
+            image,
+            sprites: data.sprites,
+          };
+        })
+      )
+    );
+    return forkJoin(observables);
+  }
 }
