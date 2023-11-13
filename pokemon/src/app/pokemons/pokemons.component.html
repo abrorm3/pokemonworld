@@ -1,7 +1,9 @@
-<div class="flex flex-wrap">
-  <div *ngFor="let pokemon of pokemonData">
-    <div class="mb-4 mx-4">
-      <app-card [pokemon]="pokemon"></app-card>
+<div class="flex justify-center">
+  <div class="flex flex-wrap justify-center p-2 w-[1100px]">
+    <div *ngFor="let pokemon of pokemonData" class="">
+      <div class="m-2">
+        <app-card [pokemon]="pokemon"></app-card>
+      </div>
     </div>
   </div>
 </div>
