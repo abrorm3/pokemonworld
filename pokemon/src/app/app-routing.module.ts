@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CardsComponent } from './cards/cards.component';
-import { CardDetailsComponent } from './cards/card-details/card-details.component';
+import { CardDetailsComponent } from './pokemons/card-details/card-details.component';
+import { PokemonsComponent } from './pokemons/pokemons.component';
 
 const routes: Routes = [
-  {path: '', component:CardsComponent},
+  {path: '', component:PokemonsComponent},
   {path: ':id', component:CardDetailsComponent}
 ];
 
