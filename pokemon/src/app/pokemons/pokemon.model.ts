@@ -1,15 +1,24 @@
 export interface PokemonDetails {
   id: number;
   name: string;
+  order: number;
+  weight: number;
+  hp: number;
+  stats: { base_stat: number }[];
   image: string;
   height: number;
-  experience: number;
-  order: number;
   attack: number;
   defense: number;
   specialAttack: number;
-  specialDefense: number;
   speed: number;
+  base_experience: number;
+  sprites: {
+    other: {
+      dream_world: {
+        front_default: string;
+      };
+    };
+  };
 }
 export interface PokemonListResponse {
   count: number;
