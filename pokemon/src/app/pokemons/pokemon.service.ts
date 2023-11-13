@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
@@ -15,12 +15,14 @@ export class PokemonService {
 
   constructor(private http: HttpClient) {}
 
-  fetchAPI(): Observable<PokemonListResponse> {
-    return this.http.get<PokemonListResponse>(this.baseUrl);
+  fetchAPI(limitNumber: number): Observable<PokemonListResponse> {
+    let params = new HttpParams();
+    params = params.set('?limit', limitNumber);
+    return this.http.get<PokemonListResponse>(this.baseUrl+params);
   }
 
-  attachData(): Observable<void> {
-    return this.fetchAPI().pipe(
+  attachData(limitNum:number): Observable<void> {
+    return this.fetchAPI(limitNum).pipe(
       map((data: PokemonListResponse) => {
         this.pokemonsRaw = data.results;
         this.attachUrls();

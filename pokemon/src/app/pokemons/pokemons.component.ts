@@ -13,12 +13,19 @@ import { PokemonService } from './pokemon.service';
 })
 export class PokemonsComponent implements OnInit {
   pokemonData: PokemonDetails[] = [];
+  currPage: number = 6;
+  loading:boolean = false;
 
   constructor(private pokemonService: PokemonService,private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.pokemonService.attachData().subscribe(() => {
+    this.triggerFetch();
+  }
+  triggerFetch(){
+    this.loading =true;
+    this.pokemonService.attachData(this.currPage).subscribe(() => {
       this.getData();
+      this.loading =false;
     });
   }
 
@@ -31,6 +38,11 @@ export class PokemonsComponent implements OnInit {
         console.error('Error in fetchPokemonDetails:', error);
       }
     });
+  }
+  nextPage(){
+    this.loading = true;
+    this.currPage= this.currPage + 6;
+    this.triggerFetch()
   }
 
 }
