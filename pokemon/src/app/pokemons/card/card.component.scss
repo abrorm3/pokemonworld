@@ -1,0 +1,12 @@
+.circle{
+  border-radius: 50%;
+}
+.detail{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 13px;
+}
+.detail p:first-child {
+  font-weight: 800;
+}

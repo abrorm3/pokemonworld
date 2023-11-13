@@ -1,3 +1,7 @@
-<div *ngFor="let pokemon of pokemonData">
-  <h1>{{pokemon.name}}</h1>
+<div class="flex flex-wrap">
+  <div *ngFor="let pokemon of pokemonData">
+    <div class="mb-4 mx-4">
+      <app-card [pokemon]="pokemon"></app-card>
+    </div>
+  </div>
 </div>

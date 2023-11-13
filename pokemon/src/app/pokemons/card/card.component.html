@@ -1,1 +1,27 @@
-<p>card works!</p>
+<div class="h-[400px] w-[300px] mx-auto bg-white rounded-lg overflow-hidden shadow-md relative">
+  <div class="h-[330px] w-[330px] bg-yellow-400 circle absolute top-[-50%] left-1/2 transform -translate-x-1/2"></div>
+
+  <div class="p-6 relative">
+    <p class="bg-white px-4 py-1 text-xs absolute inline rounded-full right-4">ID:{{pokemon.id}}</p>
+    <img class="mx-auto mt-[15%] h-[150px]" [src]="pokemon.image" width="60%" alt="pokemon img">
+    <h3 class="text-sm my-5 font-semibold text-gray-800 text-center">{{pokemon.name | uppercase}}</h3>
+    <div class="details flex justify-between items-center pt-2">
+      <div class="detail">
+        <p>{{pokemon.height}}</p>
+        <p>Height</p>
+      </div>
+      <div class="detail">
+        <p>{{pokemon.base_experience}}</p>
+        <p>Experience</p>
+      </div>
+      <div class="detail">
+        <p>{{pokemon.order}}</p>
+        <p>Order</p>
+      </div>
+    </div>
+    <div class="text-center">
+      <button class="py-1 px-3 bg-green-500 mx-auto mt-6 text-white rounded-xl">Show more</button>
+    </div>
+
+  </div>
+</div>
