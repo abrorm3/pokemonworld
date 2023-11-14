@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 import { PokemonDetails, PokemonListResponse, PokemonResult } from './pokemon.model';
 
@@ -17,11 +17,11 @@ export class PokemonService {
 
   fetchAPI(limitNumber: number): Observable<PokemonListResponse> {
     let params = new HttpParams();
-    params = params.set('?limit', limitNumber);
-    return this.http.get<PokemonListResponse>(this.baseUrl+params);
+    params = params.set('limit', limitNumber.toString());
+    return this.http.get<PokemonListResponse>(this.baseUrl, { params });
   }
 
-  attachData(limitNum:number): Observable<void> {
+  attachData(limitNum: number): Observable<void> {
     return this.fetchAPI(limitNum).pipe(
       map((data: PokemonListResponse) => {
         this.pokemonsRaw = data.results;
@@ -30,11 +30,10 @@ export class PokemonService {
     );
   }
 
-  fetchPokemon(url: string): Observable<PokemonDetails> {
+  errorHandler(url: string): Observable<PokemonDetails> {
     return this.http.get<PokemonDetails>(url).pipe(
       catchError((error) => {
         console.error('Error in fetchPokemon:', error);
-        // Return a default PokemonDetails object or handle the error as needed
         return of({
           id: 0,
           name: 'Unknown',
@@ -43,6 +42,7 @@ export class PokemonService {
           attack: 0,
           defense: 0,
           specialAttack: 0,
+          specialDefense:0,
           speed: 0,
           base_experience: 0,
           order: 0,
@@ -61,34 +61,45 @@ export class PokemonService {
 
   fetchPokemonDetails(): Observable<PokemonDetails[]> {
     const observables: Observable<PokemonDetails>[] = this.pokemonsUrl.map((url) =>
-      this.fetchPokemon(url).pipe(
-        map((data) => {
-          const hp = data.stats[0].base_stat;
-          const attack = data.stats[1].base_stat;
-          const defense = data.stats[2].base_stat;
-          const specialAttack = data.stats[3].base_stat;
-          const speed = data.stats[4].base_stat;
-          const image = data.sprites.other.dream_world.front_default;
-
-          return {
-            id: data.id,
-            name: data.name,
-            height: data.height,
-            hp,
-            attack,
-            defense,
-            specialAttack,
-            speed,
-            base_experience: data.base_experience,
-            order: data.order,
-            weight: data.weight,
-            stats: data.stats,
-            image,
-            sprites: data.sprites,
-          };
-        })
+      this.errorHandler(url).pipe(
+        map((data) => this.mapPokemonDetails(data))
       )
     );
     return forkJoin(observables);
+  }
+
+  fetchPokemonById(id: string): Observable<PokemonDetails> {
+    const url = `${this.baseUrl}${id}/`;
+    return this.errorHandler(url).pipe(
+      map((data) => this.mapPokemonDetails(data))
+    );
+  }
+
+  private mapPokemonDetails(data: PokemonDetails): PokemonDetails {
+    const hp = data.stats[0].base_stat;
+    const attack = data.stats[1].base_stat;
+    const defense = data.stats[2].base_stat;
+    const specialAttack = data.stats[3].base_stat;
+    const specialDefense = data.stats[4].base_stat;
+    const speed = data.stats[4].base_stat;
+    const image = data.sprites.other.dream_world.front_default;
+
+    return {
+      id: data.id,
+      name: data.name,
+      height: data.height,
+      hp,
+      attack,
+      defense,
+      specialAttack,
+      specialDefense,
+      speed,
+      base_experience: data.base_experience,
+      order: data.order,
+      weight: data.weight,
+      stats: data.stats,
+      image,
+      sprites: data.sprites,
+    };
   }
 }

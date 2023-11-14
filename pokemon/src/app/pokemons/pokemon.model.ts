@@ -10,6 +10,7 @@ export interface PokemonDetails {
   attack: number;
   defense: number;
   specialAttack: number;
+  specialDefense: number;
   speed: number;
   base_experience: number;
   sprites: {
